@@ -1,15 +1,82 @@
-<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no'><meta name='theme-color' content='#e8c87d'><title>Saltwater General Store · V0.2.1</title><link rel='stylesheet' href='style.css'></head><body>
-<div id='app'>
-<div id='menu' class='menu-overlay'><div class='menu-card'><div class='sun'></div><div class='menu-kicker'>A TINY SHOP SOMEWHERE ON THE COAST</div><h1>SALTWATER<br><span>GENERAL STORE</span></h1><p>Fish, chips, burgers & questionable service.</p><button id='startGame'>OPEN THE SHOP</button><small>Swipe ↓ take order · Tap load · Swipe ↓ cook · Swipe ↑ send</small></div></div>
-<header><b>$<span id='money'>0</span></b><span class='brand'>SALTWATER</span><span>★ <span id='rating'>3.5</span></span><span id='clock'>9:00</span></header>
-<main id='shop'><div class='awning'></div><div class='wall-sign'>ICE CREAM · COLD DRINKS · HOT FOOD</div><div class='shelf shelf-a'></div><div class='shelf shelf-b'></div><div class='table t1'></div><div class='table t2'></div><div class='hint'>SWIPE ↓ ON THE CUSTOMER AT THE COUNTER</div><div id='floor'></div><div id='counter'><span>ORDER RAIL</span><i>🔔</i></div></main>
-<section id='tickets'><div class='empty'>The shop is quiet… for now.</div></section>
-<section id='stations'>
- <div class='station chips' data-kind='chips'><b>CHIPS</b><strong>0/3</strong><small>tap load · swipe ↓</small><div class='bar'><i></i></div></div>
- <div class='station fish' data-kind='fish'><b>FISH</b><strong>0/2</strong><small>tap load · swipe ↓</small><div class='bar'><i></i></div></div>
- <div class='station burger' data-kind='burger'><b>BURGERS</b><strong>0/2</strong><small>tap load · swipe ↓</small><div class='bar'><i></i></div></div>
- <button id='drink'><b>FRIDGE</b><strong>DRINK</strong><small>tap · instant</small></button>
-</section>
-<div id='autoServe'>🔔 DING! COMPLETED ORDERS GO STRAIGHT OUT</div>
-<footer><button data-mode='normal' class='active'>NORMAL</button><button data-mode='rush'>RUSH</button><button data-mode='chaos'>CHAOS</button><button id='reset'>RESET</button></footer><div id='toast'></div>
-</div><script src='game.js'></script></body></html>
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#17383a">
+<title>Saltwater General Store · V0.3</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <div id="menu" class="overlay">
+    <div class="menu-card">
+      <div class="sun"></div>
+      <div class="menu-kicker">SOMEWHERE ON THE COAST · SUMMER 1997</div>
+      <h1>SALTWATER<br><span>GENERAL STORE</span></h1>
+      <p>Keep the locals fed. Try not to burn the place down.</p>
+      <button id="startGame" class="primary">OPEN THE SHOP</button>
+      <button id="menuUpgrades" class="secondary">UPGRADES</button>
+      <small>Swipe ↓ customer · Tap to load · Swipe ↓ cook · Swipe ↑ send</small>
+    </div>
+  </div>
+
+  <div id="upgradeOverlay" class="overlay hidden">
+    <div class="upgrade-card">
+      <h2>SHOP UPGRADES</h2>
+      <p class="upgrade-sub">Spend today's takings. Upgrades apply immediately.</p>
+      <div id="upgradeList"></div>
+      <button id="closeUpgrades" class="primary">BACK TO SHOP</button>
+    </div>
+  </div>
+
+  <div id="gameOver" class="overlay hidden">
+    <div class="menu-card">
+      <div class="menu-kicker">THE REVIEWS ARE IN</div>
+      <h1>SHOP<br><span>CLOSED</span></h1>
+      <p id="gameOverStats"></p>
+      <button id="restartGame" class="primary">TRY AGAIN</button>
+    </div>
+  </div>
+
+  <header>
+    <b>$<span id="money">0</span></b>
+    <span class="brand">SALTWATER</span>
+    <span>★ <span id="rating">3.5</span></span>
+    <span id="clock">9:00</span>
+  </header>
+
+  <main id="shop">
+    <div class="awning"></div>
+    <div class="wall-sign">ICE CREAM · COLD DRINKS · HOT FOOD</div>
+    <div class="door"><span>OPEN</span></div>
+    <div class="freezer">ICE<br>CREAM</div>
+    <div class="shelf shelf-a"></div>
+    <div class="shelf shelf-b"></div>
+    <div class="table t1"></div>
+    <div class="table t2"></div>
+    <div class="hint">SWIPE ↓ ON THE CUSTOMER AT THE COUNTER</div>
+    <div id="floor"></div>
+    <div id="counter"><span>ORDER RAIL</span><i id="bell">🔔</i></div>
+  </main>
+
+  <section id="tickets"><div class="empty">The shop is quiet… for now.</div></section>
+
+  <section id="stations">
+    <div class="station chips" data-kind="chips"><b>CHIPS</b><strong>0/3</strong><small>tap load · swipe ↓</small><div class="bar"><i></i></div></div>
+    <div class="station fish" data-kind="fish"><b>FISH</b><strong>0/2</strong><small>tap load · swipe ↓</small><div class="bar"><i></i></div></div>
+    <div class="station burger" data-kind="burger"><b>BURGERS</b><strong>0/2</strong><small>tap load · swipe ↓</small><div class="bar"><i></i></div></div>
+    <button id="drink"><b>FRIDGE</b><strong>DRINK</strong><small>tap · instant</small></button>
+  </section>
+
+  <footer>
+    <button id="upgradeBtn">UPGRADES</button>
+    <button data-mode="normal" class="active">NORMAL</button>
+    <button data-mode="rush">RUSH</button>
+    <button data-mode="chaos">CHAOS</button>
+  </footer>
+  <div id="toast"></div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

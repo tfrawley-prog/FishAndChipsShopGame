@@ -1,6 +1,7 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const floor=$('#floor'),ticketsEl=$('#tickets'),toast=$('#toast'),bell=$('#bell');
 let money=0,rating=3.5,id=0,elapsed=0,mode='normal',lastSpawn=0,customers=[],tickets=[],gameStarted=false,paused=false,lastFrame=0,served=0,missed=0,firstOrder=true;
+let soundOn=true,tutorialActive=false,tutorialStep=0,tutorialCustomer=null;
 const cfg={chips:{cap:3,cook:7000,green:5500,burn:7500,level:1},fish:{cap:2,cook:8500,green:5500,burn:7500,level:1},burger:{cap:2,cook:6500,green:5000,burn:7000,level:1}};
 const stationNames={chips:'Chip Fryer',fish:'Fish Fryer',burger:'Burger Grill'};
 const people=[
@@ -110,6 +111,7 @@ $$('.station').forEach(el=>stations[el.dataset.kind]={el,kind:el.dataset.kind,qt
 
 let audioCtx;
 function tone(freq=440,dur=.06,type='square',vol=.035){
+ if(!soundOn)return;
  try{
   audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
   const o=audioCtx.createOscillator(),g=audioCtx.createGain();
@@ -117,11 +119,12 @@ function tone(freq=440,dur=.06,type='square',vol=.035){
   o.start();g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+dur);o.stop(audioCtx.currentTime+dur);
  }catch{}
 }
-function buzz(ms=25){try{navigator.vibrate?.(ms)}catch{}}
+function buzz(ms=25){if(!soundOn)return;try{navigator.vibrate?.(ms)}catch{}}
 function say(s,ms=900){toast.textContent=s;toast.classList.add('show');clearTimeout(say.t);say.t=setTimeout(()=>toast.classList.remove('show'),ms)}
 function updateHUD(){ $('#money').textContent=money; $('#rating').textContent=rating.toFixed(1); let m=9*60+Math.floor(elapsed/1000*2); $('#clock').textContent=`${Math.floor(m/60)%24}:${String(m%60).padStart(2,'0')}` }
 
 function randomOrder(person){
+ if(tutorialActive && tutorialCustomer && person===tutorialCustomer.person) return {chips:1};
  let r=Math.random();
  const chaosTags=['ASTRONAUT','CAVEMAN','PIRATE','VIKING','WIZARD','ALIEN','ROBOT','ZOMBIE','SANTA','FISH & CHIP CRITIC','FOOTY FAN','BEACH CRICKET GUY'];
  const silly=chaosTags.includes(person.tag);
@@ -138,6 +141,7 @@ function randomOrder(person){
  return o;
 }
 function spawn(){
+ if(tutorialActive && tutorialCustomer) return;
  if(customers.filter(c=>c.stage==='counter').length) return;
  let p=people[Math.floor(Math.random()*people.length)];
  let base=rating>=4.5?30000:34000;
@@ -147,7 +151,9 @@ function spawn(){
  el.style.setProperty('--shirt',p.shirt);el.style.setProperty('--skin',p.skin);el.style.setProperty('--hair',p.hair);
  el.innerHTML=`<span class="head"></span><span class="hair"></span><span class="body"></span><span class="acc">${p.acc||''}</span><em class="mood"></em><span class="tag">${p.tag}</span>`;
  floor.append(el);c.el=el;el.style.left='47%';el.style.top='12%';
- setTimeout(()=>{if(!c.el)return;c.stage='counter';el.classList.add('counter');el.style.left='44%';el.style.top='72%';tone(660,.05);},380);
+ setTimeout(()=>{if(!c.el)return;c.stage='counter';el.classList.add('counter');el.style.left='44%';el.style.top='72%';tone(660,.05);
+   if(tutorialActive && !tutorialCustomer){tutorialCustomer=c; showTutorialStep(0);}
+ },380);
  attachSwipe(el,c);
 }
 function attachSwipe(el,c){
@@ -156,6 +162,7 @@ function attachSwipe(el,c){
  el.addEventListener('pointerup',e=>{if(sy!=null&&e.clientY-sy>32&&c.stage==='counter')takeOrder(c);sy=null});
 }
 function takeOrder(c){
+ if(tutorialActive && tutorialStep!==0 && c===tutorialCustomer)return;
  c.order=randomOrder(c.person);c.stage='waiting';c.taken=performance.now();c.patience=mode==='chaos'?32000:mode==='rush'?44000:60000;
  c.el.classList.remove('counter');c.el.style.left=(9+Math.random()*76)+'%';c.el.style.top=(25+Math.random()*38)+'%';
  tickets.push({id:c.id,customer:c,need:{...c.order},done:{}});
@@ -163,6 +170,7 @@ function takeOrder(c){
  let desc=Object.entries(c.order).map(([k,n])=>`${k.toUpperCase()} ×${n}`).join(' · ');
  say(desc,1300);renderTickets();
  if(firstOrder){firstOrder=false;$('.hint').classList.add('hide')}
+ if(tutorialActive && c===tutorialCustomer){tutorialStep=1;setTimeout(()=>showTutorialStep(1),180)}
 }
 function renderTickets(){
  ticketsEl.innerHTML='';
@@ -200,25 +208,36 @@ function completeOrder(t){
  t.customer.el?.classList.add('served');setTimeout(()=>t.customer.el?.remove(),260);
  customers=customers.filter(c=>c!==t.customer);tickets=tickets.filter(x=>x!==t);
  buzz(quick?75:50);say((quick?'NICE! ':'ORDER OUT! ')+`+$${reward}`,1150);renderTickets();updateUpgradeUI();
+ if(tutorialActive && t.customer===tutorialCustomer){setTimeout(finishTutorial,700)}
 }
 function stationTap(s){
+ if(tutorialActive && tutorialStep===1 && s.kind!=='chips')return;
+ if(tutorialActive && tutorialStep>1 && tutorialStep<4 && s.kind!=='chips')return;
  if(s.state==='fire'){
    s.state='idle';s.qty=0;s.el.className='station '+s.kind;
    say('FIRE OUT — BACK TO WORK');rating=Math.max(0,rating-.25);buzz(120);tone(130,.15,'sawtooth');drawStation(s);return;
  }
  if(s.state!=='idle')return;
- if(s.qty<cfg[s.kind].cap){s.qty++;buzz(12);tone(250+s.qty*45,.035);drawStation(s)}
+ if(s.qty<cfg[s.kind].cap){s.qty++;buzz(12);tone(250+s.qty*45,.035);drawStation(s);
+   if(tutorialActive && tutorialStep===1 && s.kind==='chips'){tutorialStep=2;setTimeout(()=>showTutorialStep(2),120)}
+ }
 }
 function startStation(s){
+ if(tutorialActive && tutorialStep!==2 && s.kind==='chips')return;
  if(s.state!=='idle'||!s.qty)return;
  s.state='cooking';s.started=performance.now();s.readyAt=s.started+cfg[s.kind].cook;
  s.el.classList.add('cooking');buzz(28);tone(180,.07);drawStation(s);
+ if(tutorialActive && tutorialStep===2 && s.kind==='chips'){tutorialStep=3;setTimeout(()=>showTutorialStep(3),120)}
+
 }
 function collect(s){
+ if(tutorialActive && s.kind==='chips' && tutorialStep!==4 && s.state==='ready')return;
  if(s.state!=='ready'&&s.state!=='burn')return;
  const burnt=s.state==='burn';
  if(burnt){rating=Math.max(0,rating-.07);say('BURNT BATCH — BINNED',1050);buzz(90);tone(110,.12,'sawtooth')}
- else{fulfill(s.kind,s.qty);say(s.kind.toUpperCase()+' SENT');buzz(45);tone(780,.055)}
+ else{fulfill(s.kind,s.qty);say(s.kind.toUpperCase()+' SENT');buzz(45);tone(780,.055);
+   if(tutorialActive && tutorialStep===4 && s.kind==='chips'){tutorialStep=5;setTimeout(()=>showTutorialStep(5),180)}
+ }
  s.qty=0;s.state='idle';s.started=0;s.readyAt=0;s.el.className='station '+s.kind;drawStation(s);
 }
 function drawStation(s){
@@ -274,8 +293,48 @@ $('#upgradeBtn').onclick=openUpgrades;
 $('#menuUpgrades').onclick=openUpgrades;
 $('#closeUpgrades').onclick=closeUpgrades;
 
+
+function clearTutorialTarget(){
+ $$('.tutorial-target').forEach(x=>x.classList.remove('tutorial-target'));
+}
+function showTutorialStep(step){
+ clearTutorialTarget();
+ const tut=$('#tutorial'),title=$('#tutorialTitle'),txt=$('#tutorialText'),gesture=$('#tutorialGesture');
+ tut.classList.remove('hidden');
+ if(step===0){
+   title.textContent='1 · TAKE THE ORDER';
+   txt.textContent='Swipe DOWN on the customer at the counter to receive their order.';
+   gesture.textContent='↓'; tutorialCustomer?.el?.classList.add('tutorial-target');
+ }else if(step===1){
+   title.textContent='2 · LOAD THE CHIPS';
+   txt.textContent='They want 1 chips. TAP the CHIPS station once to load one portion.';
+   gesture.textContent='●'; stations.chips.el.classList.add('tutorial-target');
+ }else if(step===2){
+   title.textContent='3 · START COOKING';
+   txt.textContent='Swipe DOWN on CHIPS to lower the fryer and start cooking.';
+   gesture.textContent='↓'; stations.chips.el.classList.add('tutorial-target');
+ }else if(step===3){
+   title.textContent='4 · LET THEM COOK';
+   txt.textContent='Wait for the fryer to turn READY. Keep an eye on it!';
+   gesture.textContent='…'; stations.chips.el.classList.add('tutorial-target');
+ }else if(step===4){
+   title.textContent='5 · SEND THE CHIPS';
+   txt.textContent='READY! Swipe UP on CHIPS to send the food to the order.';
+   gesture.textContent='↑'; stations.chips.el.classList.add('tutorial-target');
+ }else{
+   title.textContent='ORDER COMPLETE!';
+   txt.textContent='The docket fills automatically. The bell rings and the customer leaves.';
+   gesture.textContent='✓';
+ }
+}
+function finishTutorial(){
+ clearTutorialTarget();$('#tutorial').classList.add('hidden');
+ tutorialActive=false;tutorialCustomer=null;lastSpawn=performance.now();
+ say("THAT'S IT — KEEP 'EM HAPPY!",1700);tone(660,.06);setTimeout(()=>tone(880,.1),80);
+}
+
 $('#startGame').onclick=()=>{
- gameStarted=true;paused=false;lastSpawn=performance.now();lastFrame=performance.now();
+ gameStarted=true;paused=false;tutorialActive=true;tutorialStep=0;tutorialCustomer=null;lastSpawn=performance.now();lastFrame=performance.now();
  $('#menu').classList.add('hidden');buzz(35);tone(440,.05);setTimeout(()=>tone(660,.08),70);spawn();requestAnimationFrame(loop);
 };
 $('#restartGame').onclick=()=>location.reload();
@@ -292,7 +351,7 @@ function loop(now){
  // Success attracts more people: higher rating slightly accelerates arrivals.
  let ramp=Math.min(2200,elapsed*.014),repBoost=Math.max(0,rating-3.5)*500;
  let interval=(mode==='chaos'?3300:mode==='rush'?5200:8200)-ramp-repBoost;
- if(now-lastSpawn>interval&&customers.length<18){spawn();lastSpawn=now}
+ if(!tutorialActive && now-lastSpawn>interval&&customers.length<18){spawn();lastSpawn=now}
  customers.slice().forEach(c=>{
    let start=c.stage==='counter'?c.born:c.taken;if(!start)return;
    let age=now-start,limit=c.patience,ratio=age/limit;
@@ -311,7 +370,9 @@ function loop(now){
  Object.values(stations).forEach(s=>{
    if(s.state==='cooking'){
      let p=(now-s.started)/cfg[s.kind].cook;s.el.querySelector('.bar i').style.width=Math.min(100,p*100)+'%';
-     if(now>=s.readyAt){s.state='ready';s.el.classList.add('ready');drawStation(s);tone(900,.06)}
+     if(now>=s.readyAt){s.state='ready';s.el.classList.add('ready');drawStation(s);tone(900,.06);
+       if(tutorialActive && tutorialStep===3 && s.kind==='chips'){tutorialStep=4;showTutorialStep(4)}
+     }
    }else if(s.state==='ready'&&now>s.readyAt+cfg[s.kind].green){
      s.state='burn';s.el.classList.remove('ready');s.el.classList.add('burn');drawStation(s);tone(220,.1,'sawtooth');
    }else if(s.state==='burn'&&now>s.readyAt+cfg[s.kind].green+cfg[s.kind].burn){
@@ -323,3 +384,10 @@ function loop(now){
  requestAnimationFrame(loop);
 }
 updateHUD();updateUpgradeUI();
+
+const soundToggle=$('#soundToggle');
+soundToggle.onclick=()=>{
+ soundOn=!soundOn;
+ soundToggle.textContent='SOUND: '+(soundOn?'ON':'OFF');
+ if(soundOn){tone(660,.05);setTimeout(()=>tone(880,.06),60)}
+};

@@ -4,19 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#17383a">
-<title>Saltwater General Store · V0.4 Preview</title>
+<title>Saltwater General Store · V0.5.1</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="app">
   <div id="menu" class="overlay">
-    <div class="menu-card">
+    <div class="menu-card"><div class="logo-lockup"><span>SALTWATER</span><b>GENERAL STORE</b><small>FISH · CHIPS · BURGERS · DRINKS · GOOD TIMES</small></div>
       <div class="sun"></div>
       <div class="menu-kicker">SOMEWHERE ON THE COAST · SUMMER 1997</div>
       <h1>SALTWATER<br><span>GENERAL STORE</span></h1>
       <p>Keep the locals fed. Try not to burn the place down.</p>
       <button id="startGame" class="primary">OPEN THE SHOP</button>
       <button id="menuUpgrades" class="secondary">UPGRADES</button>
+      <button id="soundToggle" class="secondary">SOUND: ON</button>
       <small>Swipe ↓ customer · Tap to load · Swipe ↓ cook · Swipe ↑ send</small>
     </div>
   </div>
@@ -41,12 +42,12 @@
 
   <header>
     <b>$<span id="money">0</span></b>
-    <span class="brand">SALTWATER · V0.4</span>
+    <span class="brand">SALTWATER · V0.5.1</span>
     <span>★ <span id="rating">3.5</span></span>
     <span id="clock">9:00</span>
   </header>
 
-  <main id="shop">
+  <main id="shop"><div class="art-backdrop"></div>
     <div class="awning"></div>
     <div class="wall-sign">ICE CREAM · COLD DRINKS · HOT FOOD</div>
     <div class="door"><span>OPEN</span></div>
@@ -75,6 +76,14 @@
     <button data-mode="rush">RUSH</button>
     <button data-mode="chaos">CHAOS</button>
   </footer>
+  <div id="tutorial" class="tutorial hidden">
+    <div id="tutorialShade"></div>
+    <div id="tutorialCard">
+      <b id="tutorialTitle">WELCOME!</b>
+      <span id="tutorialText"></span>
+      <i id="tutorialGesture">↓</i>
+    </div>
+  </div>
   <div id="toast"></div>
 </div>
 <script src="game.js"></script>

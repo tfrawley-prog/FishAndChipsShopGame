@@ -1,28 +1,57 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const floor=$('#floor'),ticketsEl=$('#tickets'),bell=$('#bell'),toast=$('#toast');
+const floor=$('#floor'),ticketsEl=$('#tickets'),toast=$('#toast');
 let money=0,rating=3.5,id=0,elapsed=0,mode='normal',lastSpawn=0,customers=[],tickets=[],gameStarted=false,lastFrame=0;
-const cfg={chips:{cap:3,cook:6500,green:2600,burn:4500},fish:{cap:2,cook:8000,green:2400,burn:4200},burger:{cap:2,cook:5500,green:2200,burn:3500}};
+const cfg={chips:{cap:3,cook:7000,green:5000,burn:6500},fish:{cap:2,cook:8500,green:5000,burn:6500},burger:{cap:2,cook:6500,green:4500,burn:6000}};
 const stations={};
 $$('.station').forEach(el=>stations[el.dataset.kind]={el,kind:el.dataset.kind,qty:0,state:'idle',started:0,readyAt:0});
 function buzz(ms=25){try{navigator.vibrate?.(ms)}catch{}}
-function say(s){toast.textContent=s;toast.classList.add('show');clearTimeout(say.t);say.t=setTimeout(()=>toast.classList.remove('show'),800)}
+function say(s,ms=900){toast.textContent=s;toast.classList.add('show');clearTimeout(say.t);say.t=setTimeout(()=>toast.classList.remove('show'),ms)}
 function updateHUD(){ $('#money').textContent=money; $('#rating').textContent=rating.toFixed(1); let m=9*60+Math.floor(elapsed/1000*2); $('#clock').textContent=`${Math.floor(m/60)%24}:${String(m%60).padStart(2,'0')}` }
 function randomOrder(){let r=Math.random(); if(r<.06){let k=['chips','fish','burger'][Math.floor(Math.random()*3)];return {[k]:5+Math.floor(Math.random()*4)}} let o={}; let count=1+(Math.random()<.55?1:0)+(Math.random()<.18?1:0); for(let i=0;i<count;i++){let k=['chips','fish','burger','drink'][Math.floor(Math.random()*4)];o[k]=(o[k]||0)+1+(Math.random()<.12?1:0)} return o}
-function spawn(){if(customers.filter(c=>c.stage==='counter').length) return; let c={id:++id,stage:'enter',born:performance.now(),patience:mode==='chaos'?9000:mode==='rush'?12000:16000,order:null};customers.push(c);let el=document.createElement('div');el.className='customer';el.dataset.id=c.id;el.textContent=c.id;floor.append(el);c.el=el;el.style.left='46%';el.style.top='8%';setTimeout(()=>{if(!c.el)return;c.stage='counter';el.classList.add('counter');el.style.left='44%';el.style.top='72%';},350);attachSwipe(el,c)}
+function spawn(){if(customers.filter(c=>c.stage==='counter').length) return; let c={id:++id,stage:'enter',born:performance.now(),patience:mode==='chaos'?18000:mode==='rush'?24000:32000,order:null};customers.push(c);let el=document.createElement('div');el.className='customer';el.dataset.id=c.id;el.textContent=c.id;floor.append(el);c.el=el;el.style.left='46%';el.style.top='8%';setTimeout(()=>{if(!c.el)return;c.stage='counter';el.classList.add('counter');el.style.left='44%';el.style.top='72%';},350);attachSwipe(el,c)}
 function attachSwipe(el,c){let sy=null;el.addEventListener('pointerdown',e=>{sy=e.clientY;el.setPointerCapture(e.pointerId)});el.addEventListener('pointerup',e=>{if(sy!=null&&e.clientY-sy>35&&c.stage==='counter') takeOrder(c);sy=null})}
-function takeOrder(c){c.order=randomOrder();c.stage='waiting';c.taken=performance.now();c.patience=22000;c.el.classList.remove('counter');c.el.style.left=(8+Math.random()*78)+'%';c.el.style.top=(18+Math.random()*45)+'%';tickets.push({id:c.id,customer:c,need:{...c.order},done:{}});buzz();say('ORDER '+c.id);renderTickets()}
-function renderTickets(){ticketsEl.innerHTML=''; if(!tickets.length){ticketsEl.innerHTML='<div class="empty">Take an order to begin.</div>'} tickets.forEach(t=>{let d=document.createElement('div');let ready=isReady(t);d.className='ticket'+(ready?' ready':'');d.innerHTML=`<b>#${t.id}${ready?' — READY':''}</b>`+Object.entries(t.need).map(([k,n])=>`<div class="${(t.done[k]||0)>=n?'done':''}">${k.toUpperCase()} ×${n} ${(t.done[k]||0)>=n?'✓':''}</div>`).join('');ticketsEl.append(d)});bell.disabled=!tickets.some(isReady)}
+function takeOrder(c){c.order=randomOrder();c.stage='waiting';c.taken=performance.now();c.patience=mode==='chaos'?26000:mode==='rush'?36000:48000;c.el.classList.remove('counter');c.el.style.left=(8+Math.random()*78)+'%';c.el.style.top=(18+Math.random()*45)+'%';tickets.push({id:c.id,customer:c,need:{...c.order},done:{}});buzz();say('ORDER '+c.id);renderTickets()}
+function renderTickets(){ticketsEl.innerHTML=''; if(!tickets.length){ticketsEl.innerHTML='<div class="empty">Take an order to begin.</div>'} tickets.forEach(t=>{let d=document.createElement('div');let ready=isReady(t);d.className='ticket'+(ready?' ready':'');d.innerHTML=`<b>#${t.id}${ready?' — READY':''}</b>`+Object.entries(t.need).map(([k,n])=>`<div class="${(t.done[k]||0)>=n?'done':''}">${k.toUpperCase()} ×${n} ${(t.done[k]||0)>=n?'✓':''}</div>`).join('');ticketsEl.append(d)})}
 function isReady(t){return Object.entries(t.need).every(([k,n])=>(t.done[k]||0)>=n)}
-function fulfill(kind,n){for(let x=0;x<n;x++){let t=tickets.find(t=>(t.done[kind]||0)<(t.need[kind]||0));if(!t)break;t.done[kind]=(t.done[kind]||0)+1}renderTickets()}
+function fulfill(kind,n){
+  for(let x=0;x<n;x++){
+    let t=tickets.find(t=>(t.done[kind]||0)<(t.need[kind]||0));
+    if(!t)break;
+    t.done[kind]=(t.done[kind]||0)+1;
+  }
+  renderTickets();
+  autoCompleteOrders();
+}
+function autoCompleteOrders(){
+  const ready=tickets.filter(t=>isReady(t)&&!t.completing);
+  ready.forEach((t,i)=>{
+    t.completing=true;
+    setTimeout(()=>completeOrder(t),120+i*220);
+  });
+}
+function completeOrder(t){
+  if(!tickets.includes(t))return;
+  const age=performance.now()-(t.customer.taken||performance.now());
+  const quick=age<12000;
+  const reward=quick?15:10;
+  money+=reward;
+  rating=Math.min(5,rating+(quick?.05:.03));
+  t.customer.el?.classList.add('served');
+  setTimeout(()=>t.customer.el?.remove(),260);
+  customers=customers.filter(c=>c!==t.customer);
+  tickets=tickets.filter(x=>x!==t);
+  buzz(quick?80:55);
+  say((quick?'NICE! ':'ORDER COMPLETE! ')+`+$${reward}`,1200);
+  renderTickets();
+}
 function stationTap(s){if(s.state==='fire'){s.state='idle';s.qty=0;s.el.className='station';say('FIRE OUT');rating=Math.max(0,rating-.3);return} if(s.state!=='idle')return;if(s.qty<cfg[s.kind].cap){s.qty++;buzz(12);drawStation(s)}}
 function startStation(s){if(s.state!=='idle'||!s.qty)return;s.state='cooking';s.started=performance.now();s.readyAt=s.started+cfg[s.kind].cook;s.el.classList.add('cooking');buzz(30);drawStation(s)}
-function collect(s){if(s.state!=='ready')return;fulfill(s.kind,s.qty);money+=s.qty*3;s.qty=0;s.state='idle';s.el.className='station';buzz(45);say(s.kind.toUpperCase()+' SENT');drawStation(s)}
+function collect(s){if(s.state!=='ready')return;fulfill(s.kind,s.qty);s.qty=0;s.state='idle';s.el.className='station';buzz(45);say(s.kind.toUpperCase()+' SENT');drawStation(s)}
 function drawStation(s){let strong=s.el.querySelector('strong'),small=s.el.querySelector('small'),bar=s.el.querySelector('.bar i');strong.textContent=`${s.qty}/${cfg[s.kind].cap}`;if(s.state==='idle'){small.textContent='tap to load · swipe ↓ start';bar.style.width='0'}else if(s.state==='cooking'){small.textContent='COOKING';}else if(s.state==='ready'){small.textContent='READY · swipe ↑';bar.style.width='100%'}else if(s.state==='burn'){small.textContent='BURNING! swipe ↑';bar.style.width='100%'}else if(s.state==='fire'){small.textContent='🔥 FIRE — TAP!';strong.textContent='🔥'}}
 Object.values(stations).forEach(s=>{let sy=null;s.el.addEventListener('pointerdown',e=>{sy=e.clientY;s.el.setPointerCapture(e.pointerId)});s.el.addEventListener('pointerup',e=>{let dy=e.clientY-sy;if(dy>35)startStation(s);else if(dy<-35)collect(s);else stationTap(s);sy=null})});
-$('#drink').onclick=()=>{fulfill('drink',1);money+=2;buzz(15);say('DRINK SENT')};
-bell.onclick=()=>{let t=tickets.find(isReady);if(!t)return;money+=10;t.customer.el?.remove();customers=customers.filter(c=>c!==t.customer);tickets=tickets.filter(x=>x!==t);rating=Math.min(5,rating+.03);buzz(60);say('DING! +$10');renderTickets()};
+$('#drink').onclick=()=>{fulfill('drink',1);buzz(15);say('DRINK SENT')};
 $$('footer [data-mode]').forEach(b=>b.onclick=()=>{$$('footer [data-mode]').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.mode;say(mode.toUpperCase())});
 $('#reset').onclick=()=>location.reload();
 $('#startGame').onclick=()=>{gameStarted=true;lastSpawn=performance.now();lastFrame=performance.now();$('#menu').classList.add('hidden');buzz(35);spawn();requestAnimationFrame(loop)};
-function loop(now){if(!gameStarted)return;const dt=Math.min(50,now-lastFrame||16);lastFrame=now;elapsed+=dt;let interval=mode==='chaos'?1800:mode==='rush'?3200:5200;if(now-lastSpawn>interval&&customers.length<18){spawn();lastSpawn=now}customers.forEach(c=>{let start=c.stage==='counter'?c.born:c.taken;if(!start)return;let age=now-start,limit=c.patience;if(age>limit*.65)c.el?.classList.add('angry');if(age>limit){rating=Math.max(0,rating-.18);c.el?.remove();customers=customers.filter(x=>x!==c);if(c.stage==='waiting'){tickets=tickets.filter(t=>t.customer!==c);renderTickets()}say('CUSTOMER LEFT ★↓')}});Object.values(stations).forEach(s=>{if(s.state==='cooking'){let p=(now-s.started)/cfg[s.kind].cook;s.el.querySelector('.bar i').style.width=Math.min(100,p*100)+'%';if(now>=s.readyAt){s.state='ready';s.el.classList.add('ready');drawStation(s)}}else if(s.state==='ready'&&now>s.readyAt+cfg[s.kind].green){s.state='burn';s.el.classList.remove('ready');s.el.classList.add('burn');drawStation(s)}else if(s.state==='burn'&&now>s.readyAt+cfg[s.kind].green+cfg[s.kind].burn){s.state='fire';s.el.classList.add('fire');rating=Math.max(0,rating-.25);drawStation(s);say('🔥 FIRE!')}});updateHUD();requestAnimationFrame(loop)}
+function loop(now){if(!gameStarted)return;const dt=Math.min(50,now-lastFrame||16);lastFrame=now;elapsed+=dt;let ramp=Math.min(2200,elapsed*.018);let interval=(mode==='chaos'?3000:mode==='rush'?4800:7600)-ramp;if(now-lastSpawn>interval&&customers.length<18){spawn();lastSpawn=now}customers.forEach(c=>{let start=c.stage==='counter'?c.born:c.taken;if(!start)return;let age=now-start,limit=c.patience;if(age>limit*.65)c.el?.classList.add('angry');if(age>limit){rating=Math.max(0,rating-.18);c.el?.remove();customers=customers.filter(x=>x!==c);if(c.stage==='waiting'){tickets=tickets.filter(t=>t.customer!==c);renderTickets()}say('CUSTOMER LEFT ★↓')}});Object.values(stations).forEach(s=>{if(s.state==='cooking'){let p=(now-s.started)/cfg[s.kind].cook;s.el.querySelector('.bar i').style.width=Math.min(100,p*100)+'%';if(now>=s.readyAt){s.state='ready';s.el.classList.add('ready');drawStation(s)}}else if(s.state==='ready'&&now>s.readyAt+cfg[s.kind].green){s.state='burn';s.el.classList.remove('ready');s.el.classList.add('burn');drawStation(s)}else if(s.state==='burn'&&now>s.readyAt+cfg[s.kind].green+cfg[s.kind].burn){s.state='fire';s.el.classList.add('fire');rating=Math.max(0,rating-.25);drawStation(s);say('🔥 FIRE!')}});updateHUD();requestAnimationFrame(loop)}
 updateHUD();

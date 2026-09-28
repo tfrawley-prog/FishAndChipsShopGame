@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no'><meta name='theme-color' content='#ececec'><title>Fish Shop V0.1</title><link rel='stylesheet' href='style.css'></head><body>
+<div id='app'>
+<div id='menu' class='menu-overlay'>
+  <div class='menu-card'>
+    <div class='menu-kicker'>GREY BOX PROTOTYPE</div>
+    <h1>FISH SHOP</h1>
+    <p>Keep the orders moving.<br>Don't let the shop fall apart.</p>
+    <button id='startGame'>START GAME</button>
+    <small>Swipe ↓ to take orders · Tap to load · Swipe ↓ to cook · Swipe ↑ to send</small>
+  </div>
+</div>
+<header><b>$<span id='money'>0</span></b><span>★ <span id='rating'>3.5</span></span><span id='clock'>9:00</span></header>
+<main id='shop'>
+  <div class='hint'>CUSTOMERS — swipe ↓ at counter to take order</div>
+  <div id='floor'></div>
+  <div id='counter'>COUNTER</div>
+</main>
+<section id='tickets'><div class='empty'>Take an order to begin.</div></section>
+<section id='stations'>
+ <div class='station' data-kind='chips'><b>CHIPS</b><strong>0/3</strong><small>tap to load · swipe ↓ start</small><div class='bar'><i></i></div></div>
+ <div class='station' data-kind='fish'><b>FISH</b><strong>0/2</strong><small>tap to load · swipe ↓ start</small><div class='bar'><i></i></div></div>
+ <div class='station' data-kind='burger'><b>BURGER</b><strong>0/2</strong><small>tap to load · swipe ↓ start</small><div class='bar'><i></i></div></div>
+ <button id='drink'>DRINK<br><small>instant</small></button>
+</section>
+<button id='bell' disabled>🔔 SERVE</button>
+<footer><button data-mode='normal' class='active'>NORMAL</button><button data-mode='rush'>RUSH</button><button data-mode='chaos'>CHAOS</button><button id='reset'>RESET</button></footer>
+<div id='toast'></div>
+</div><script src='game.js'></script></body></html>

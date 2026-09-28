@@ -4,12 +4,106 @@ let money=0,rating=3.5,id=0,elapsed=0,mode='normal',lastSpawn=0,customers=[],tic
 const cfg={chips:{cap:3,cook:7000,green:5500,burn:7500,level:1},fish:{cap:2,cook:8500,green:5500,burn:7500,level:1},burger:{cap:2,cook:6500,green:5000,burn:7000,level:1}};
 const stationNames={chips:'Chip Fryer',fish:'Fish Fryer',burger:'Burger Grill'};
 const people=[
- {tag:'SURFER',shirt:'#4d8b8e',skin:'#d8a06b',hair:'#c79a52'},
- {tag:'TRADIE',shirt:'#d89d37',skin:'#c98b5e',hair:'#6a432f'},
- {tag:'LOCAL',shirt:'#b65746',skin:'#e1aa78',hair:'#4e382f'},
- {tag:'TOURIST',shirt:'#6d7fa8',skin:'#d8a06b',hair:'#b56d43'},
- {tag:'KID',shirt:'#6b9c5b',skin:'#e4b17f',hair:'#57382b'},
- {tag:'OLD MATE',shirt:'#7c6b86',skin:'#d4a176',hair:'#c9c0ad'}
+ {tag:"SURFER",shirt:"#4d8b8e",skin:"#e4b17f",hair:"#4e382f",acc:""},
+ {tag:"TRADIE",shirt:"#d89d37",skin:"#8f5d42",hair:"#c9c0ad",acc:"GOGGLES"},
+ {tag:"LOCAL",shirt:"#b65746",skin:"#e4b17f",hair:"#c79a52",acc:"BEARD"},
+ {tag:"TOURIST",shirt:"#6d7fa8",skin:"#8f5d42",hair:"#6a432f",acc:"BANDANA"},
+ {tag:"KID",shirt:"#6b9c5b",skin:"#e4b17f",hair:"#7d5438",acc:"HELMET"},
+ {tag:"OLD MATE",shirt:"#7c6b86",skin:"#8f5d42",hair:"#292826",acc:"GLASSES"},
+ {tag:"ASTRONAUT",shirt:"#d55b4d",skin:"#e4b17f",hair:"#b56d43",acc:"HAT"},
+ {tag:"CAVEMAN",shirt:"#3d7891",skin:"#8f5d42",hair:"#4e382f",acc:"CAP"},
+ {tag:"BOARD SHORTS GUY",shirt:"#d49b43",skin:"#e4b17f",hair:"#c9c0ad",acc:""},
+ {tag:"LIFEGUARD",shirt:"#5b8b5c",skin:"#8f5d42",hair:"#c79a52",acc:"GOGGLES"},
+ {tag:"FISHERMAN",shirt:"#815f8e",skin:"#e4b17f",hair:"#6a432f",acc:"BEARD"},
+ {tag:"SCHOOL KID",shirt:"#bd7047",skin:"#8f5d42",hair:"#7d5438",acc:"BANDANA"},
+ {tag:"FOOTY FAN",shirt:"#4d8b8e",skin:"#e4b17f",hair:"#292826",acc:"HELMET"},
+ {tag:"CYCLIST",shirt:"#d89d37",skin:"#8f5d42",hair:"#b56d43",acc:"GLASSES"},
+ {tag:"BACKPACKER",shirt:"#b65746",skin:"#e4b17f",hair:"#4e382f",acc:"HAT"},
+ {tag:"SKATER",shirt:"#6d7fa8",skin:"#8f5d42",hair:"#c9c0ad",acc:"CAP"},
+ {tag:"HIPPIE",shirt:"#6b9c5b",skin:"#e4b17f",hair:"#c79a52",acc:""},
+ {tag:"COWBOY",shirt:"#7c6b86",skin:"#8f5d42",hair:"#6a432f",acc:"GOGGLES"},
+ {tag:"PIRATE",shirt:"#d55b4d",skin:"#e4b17f",hair:"#7d5438",acc:"BEARD"},
+ {tag:"NINJA",shirt:"#3d7891",skin:"#8f5d42",hair:"#292826",acc:"BANDANA"},
+ {tag:"WIZARD",shirt:"#d49b43",skin:"#e4b17f",hair:"#b56d43",acc:"HELMET"},
+ {tag:"KNIGHT",shirt:"#5b8b5c",skin:"#8f5d42",hair:"#4e382f",acc:"GLASSES"},
+ {tag:"VIKING",shirt:"#815f8e",skin:"#e4b17f",hair:"#c9c0ad",acc:"HAT"},
+ {tag:"ROMAN",shirt:"#bd7047",skin:"#8f5d42",hair:"#c79a52",acc:"CAP"},
+ {tag:"PHARAOH",shirt:"#4d8b8e",skin:"#e4b17f",hair:"#6a432f",acc:""},
+ {tag:"MUMMY",shirt:"#d89d37",skin:"#8f5d42",hair:"#7d5438",acc:"GOGGLES"},
+ {tag:"DETECTIVE",shirt:"#b65746",skin:"#e4b17f",hair:"#292826",acc:"BEARD"},
+ {tag:"CHEF",shirt:"#6d7fa8",skin:"#8f5d42",hair:"#b56d43",acc:"BANDANA"},
+ {tag:"POSTIE",shirt:"#6b9c5b",skin:"#e4b17f",hair:"#4e382f",acc:"HELMET"},
+ {tag:"FIREFIGHTER",shirt:"#7c6b86",skin:"#8f5d42",hair:"#c9c0ad",acc:"GLASSES"},
+ {tag:"PARAMEDIC",shirt:"#d55b4d",skin:"#e4b17f",hair:"#c79a52",acc:"HAT"},
+ {tag:"COP",shirt:"#3d7891",skin:"#8f5d42",hair:"#6a432f",acc:"CAP"},
+ {tag:"MECHANIC",shirt:"#d49b43",skin:"#e4b17f",hair:"#7d5438",acc:""},
+ {tag:"GARDENER",shirt:"#5b8b5c",skin:"#8f5d42",hair:"#292826",acc:"GOGGLES"},
+ {tag:"BUILDER",shirt:"#815f8e",skin:"#e4b17f",hair:"#b56d43",acc:"BEARD"},
+ {tag:"PAINTER",shirt:"#bd7047",skin:"#8f5d42",hair:"#4e382f",acc:"BANDANA"},
+ {tag:"MUSICIAN",shirt:"#4d8b8e",skin:"#e4b17f",hair:"#c9c0ad",acc:"HELMET"},
+ {tag:"ROCK STAR",shirt:"#d89d37",skin:"#8f5d42",hair:"#c79a52",acc:"GLASSES"},
+ {tag:"PUNK",shirt:"#b65746",skin:"#e4b17f",hair:"#6a432f",acc:"HAT"},
+ {tag:"BIKER",shirt:"#6d7fa8",skin:"#8f5d42",hair:"#7d5438",acc:"CAP"},
+ {tag:"BUSINESSMAN",shirt:"#6b9c5b",skin:"#e4b17f",hair:"#292826",acc:""},
+ {tag:"BUSINESSWOMAN",shirt:"#7c6b86",skin:"#8f5d42",hair:"#b56d43",acc:"GOGGLES"},
+ {tag:"GRANDMA",shirt:"#d55b4d",skin:"#e4b17f",hair:"#4e382f",acc:"BEARD"},
+ {tag:"GRANDPA",shirt:"#3d7891",skin:"#8f5d42",hair:"#c9c0ad",acc:"BANDANA"},
+ {tag:"MUM",shirt:"#d49b43",skin:"#e4b17f",hair:"#c79a52",acc:"HELMET"},
+ {tag:"DAD",shirt:"#5b8b5c",skin:"#8f5d42",hair:"#6a432f",acc:"GLASSES"},
+ {tag:"TODDLER",shirt:"#815f8e",skin:"#e4b17f",hair:"#7d5438",acc:"HAT"},
+ {tag:"TEENAGER",shirt:"#bd7047",skin:"#8f5d42",hair:"#292826",acc:"CAP"},
+ {tag:"JOGGER",shirt:"#4d8b8e",skin:"#e4b17f",hair:"#b56d43",acc:""},
+ {tag:"SWIMMER",shirt:"#d89d37",skin:"#8f5d42",hair:"#4e382f",acc:"GOGGLES"},
+ {tag:"SCUBA DIVER",shirt:"#b65746",skin:"#e4b17f",hair:"#c9c0ad",acc:"BEARD"},
+ {tag:"SNORKELLER",shirt:"#6d7fa8",skin:"#8f5d42",hair:"#c79a52",acc:"BANDANA"},
+ {tag:"SAILOR",shirt:"#6b9c5b",skin:"#e4b17f",hair:"#6a432f",acc:"HELMET"},
+ {tag:"CAPTAIN",shirt:"#7c6b86",skin:"#8f5d42",hair:"#7d5438",acc:"GLASSES"},
+ {tag:"BEACH CRICKET GUY",shirt:"#d55b4d",skin:"#e4b17f",hair:"#292826",acc:"HAT"},
+ {tag:"TENNIS PLAYER",shirt:"#3d7891",skin:"#8f5d42",hair:"#b56d43",acc:"CAP"},
+ {tag:"GOLFER",shirt:"#d49b43",skin:"#e4b17f",hair:"#4e382f",acc:""},
+ {tag:"BASKETBALLER",shirt:"#5b8b5c",skin:"#8f5d42",hair:"#c9c0ad",acc:"GOGGLES"},
+ {tag:"SOCCER PLAYER",shirt:"#815f8e",skin:"#e4b17f",hair:"#c79a52",acc:"BEARD"},
+ {tag:"RUGBY PLAYER",shirt:"#bd7047",skin:"#8f5d42",hair:"#6a432f",acc:"BANDANA"},
+ {tag:"CRICKETER",shirt:"#4d8b8e",skin:"#e4b17f",hair:"#7d5438",acc:"HELMET"},
+ {tag:"REFEREE",shirt:"#d89d37",skin:"#8f5d42",hair:"#292826",acc:"GLASSES"},
+ {tag:"BOXER",shirt:"#b65746",skin:"#e4b17f",hair:"#b56d43",acc:"HAT"},
+ {tag:"WRESTLER",shirt:"#6d7fa8",skin:"#8f5d42",hair:"#4e382f",acc:"CAP"},
+ {tag:"KARATE KID",shirt:"#6b9c5b",skin:"#e4b17f",hair:"#c9c0ad",acc:""},
+ {tag:"YOGA GUY",shirt:"#7c6b86",skin:"#8f5d42",hair:"#c79a52",acc:"GOGGLES"},
+ {tag:"GYM GUY",shirt:"#d55b4d",skin:"#e4b17f",hair:"#6a432f",acc:"BEARD"},
+ {tag:"DISCO DANCER",shirt:"#3d7891",skin:"#8f5d42",hair:"#7d5438",acc:"BANDANA"},
+ {tag:"MIME",shirt:"#d49b43",skin:"#e4b17f",hair:"#292826",acc:"HELMET"},
+ {tag:"CLOWN",shirt:"#5b8b5c",skin:"#8f5d42",hair:"#b56d43",acc:"GLASSES"},
+ {tag:"MAGICIAN",shirt:"#815f8e",skin:"#e4b17f",hair:"#4e382f",acc:"HAT"},
+ {tag:"RINGMASTER",shirt:"#bd7047",skin:"#8f5d42",hair:"#c9c0ad",acc:"CAP"},
+ {tag:"EXPLORER",shirt:"#4d8b8e",skin:"#e4b17f",hair:"#c79a52",acc:""},
+ {tag:"SAFARI GUY",shirt:"#d89d37",skin:"#8f5d42",hair:"#6a432f",acc:"GOGGLES"},
+ {tag:"ARCHAEOLOGIST",shirt:"#b65746",skin:"#e4b17f",hair:"#7d5438",acc:"BEARD"},
+ {tag:"SCIENTIST",shirt:"#6d7fa8",skin:"#8f5d42",hair:"#292826",acc:"BANDANA"},
+ {tag:"DOCTOR",shirt:"#6b9c5b",skin:"#e4b17f",hair:"#b56d43",acc:"HELMET"},
+ {tag:"NURSE",shirt:"#7c6b86",skin:"#8f5d42",hair:"#4e382f",acc:"GLASSES"},
+ {tag:"VET",shirt:"#d55b4d",skin:"#e4b17f",hair:"#c9c0ad",acc:"HAT"},
+ {tag:"TEACHER",shirt:"#3d7891",skin:"#8f5d42",hair:"#c79a52",acc:"CAP"},
+ {tag:"LIBRARIAN",shirt:"#d49b43",skin:"#e4b17f",hair:"#6a432f",acc:""},
+ {tag:"PHOTOGRAPHER",shirt:"#5b8b5c",skin:"#8f5d42",hair:"#7d5438",acc:"GOGGLES"},
+ {tag:"NEWS REPORTER",shirt:"#815f8e",skin:"#e4b17f",hair:"#292826",acc:"BEARD"},
+ {tag:"WEATHER GUY",shirt:"#bd7047",skin:"#8f5d42",hair:"#b56d43",acc:"BANDANA"},
+ {tag:"MOVIE STAR",shirt:"#4d8b8e",skin:"#e4b17f",hair:"#4e382f",acc:"HELMET"},
+ {tag:"STUNTMAN",shirt:"#d89d37",skin:"#8f5d42",hair:"#c9c0ad",acc:"GLASSES"},
+ {tag:"SUPERHERO",shirt:"#b65746",skin:"#e4b17f",hair:"#c79a52",acc:"HAT"},
+ {tag:"SECRET AGENT",shirt:"#6d7fa8",skin:"#8f5d42",hair:"#6a432f",acc:"CAP"},
+ {tag:"ALIEN",shirt:"#6b9c5b",skin:"#e4b17f",hair:"#7d5438",acc:""},
+ {tag:"ROBOT",shirt:"#7c6b86",skin:"#8f5d42",hair:"#292826",acc:"GOGGLES"},
+ {tag:"ZOMBIE",shirt:"#d55b4d",skin:"#e4b17f",hair:"#b56d43",acc:"BEARD"},
+ {tag:"GHOST",shirt:"#3d7891",skin:"#8f5d42",hair:"#4e382f",acc:"BANDANA"},
+ {tag:"SKELETON",shirt:"#d49b43",skin:"#e4b17f",hair:"#c9c0ad",acc:"HELMET"},
+ {tag:"SANTA",shirt:"#5b8b5c",skin:"#8f5d42",hair:"#c79a52",acc:"GLASSES"},
+ {tag:"ELF",shirt:"#815f8e",skin:"#e4b17f",hair:"#6a432f",acc:"HAT"},
+ {tag:"SNOWBOARDER",shirt:"#bd7047",skin:"#8f5d42",hair:"#7d5438",acc:"CAP"},
+ {tag:"SKI BUM",shirt:"#4d8b8e",skin:"#e4b17f",hair:"#292826",acc:""},
+ {tag:"HAWAIIAN SHIRT GUY",shirt:"#d89d37",skin:"#8f5d42",hair:"#b56d43",acc:"GOGGLES"},
+ {tag:"GREY NOMAD",shirt:"#b65746",skin:"#e4b17f",hair:"#4e382f",acc:"BEARD"},
+ {tag:"FISH & CHIP CRITIC",shirt:"#6d7fa8",skin:"#8f5d42",hair:"#c9c0ad",acc:"BANDANA"}
 ];
 const stations={};
 $$('.station').forEach(el=>stations[el.dataset.kind]={el,kind:el.dataset.kind,qty:0,state:'idle',started:0,readyAt:0});
@@ -29,7 +123,9 @@ function updateHUD(){ $('#money').textContent=money; $('#rating').textContent=ra
 
 function randomOrder(person){
  let r=Math.random();
- if(r<.075){
+ const chaosTags=['ASTRONAUT','CAVEMAN','PIRATE','VIKING','WIZARD','ALIEN','ROBOT','ZOMBIE','SANTA','FISH & CHIP CRITIC','FOOTY FAN','BEACH CRICKET GUY'];
+ const silly=chaosTags.includes(person.tag);
+ if(r<(silly?.16:.075)){
    let k=['chips','fish','burger'][Math.floor(Math.random()*3)];
    let n=5+Math.floor(Math.random()*4);
    return {[k]:n};
@@ -49,7 +145,7 @@ function spawn(){
  customers.push(c);
  let el=document.createElement('div');el.className='customer';el.dataset.id=c.id;
  el.style.setProperty('--shirt',p.shirt);el.style.setProperty('--skin',p.skin);el.style.setProperty('--hair',p.hair);
- el.innerHTML=`<span class="head"></span><span class="hair"></span><span class="body"></span><em class="mood">🙂</em><span class="tag">${p.tag}</span>`;
+ el.innerHTML=`<span class="head"></span><span class="hair"></span><span class="body"></span><span class="acc">${p.acc||''}</span><em class="mood"></em><span class="tag">${p.tag}</span>`;
  floor.append(el);c.el=el;el.style.left='47%';el.style.top='12%';
  setTimeout(()=>{if(!c.el)return;c.stage='counter';el.classList.add('counter');el.style.left='44%';el.style.top='72%';tone(660,.05);},380);
  attachSwipe(el,c);
@@ -201,7 +297,10 @@ function loop(now){
    let start=c.stage==='counter'?c.born:c.taken;if(!start)return;
    let age=now-start,limit=c.patience,ratio=age/limit;
    const mood=c.el?.querySelector('.mood');
-   if(mood)mood.textContent=ratio>.82?'😡':ratio>.6?'😒':ratio>.38?'😐':'🙂';
+   if(mood){
+     mood.className='mood '+(ratio>.82?'red':ratio>.6?'orange':ratio>.38?'yellow':'green');
+     mood.style.setProperty('--patience',Math.max(0,100-ratio*100)+'%');
+   }
    if(ratio>.6)c.el?.classList.add('angry');
    if(age>limit){
      rating=Math.max(0,rating-.22);missed++;c.el?.remove();customers=customers.filter(x=>x!==c);

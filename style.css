@@ -13,3 +13,54 @@
 .station.ready:after{content:"SWIPE ↑";position:absolute;top:-17px;background:#f4df70;border:2px solid #263d3a;padding:2px 4px;font-size:7px;font-weight:900}
 .station.cooking:after{content:"SIZZLE";position:absolute;top:-14px;color:#fff2bf;font-size:6px;font-weight:900;animation:sizzle .35s infinite alternate}
 @keyframes sizzle{to{transform:translateY(-2px);opacity:.55}}
+
+/* V0.5 full visual preview skin */
+:root{--ocean:#1f7180;--cream:#f3dfb4;--sun:#efbd43;--red:#b93f36;--timber:#71462f;--blue:#245a78;--dark:#17343a}
+#app{background:var(--cream);border-color:#38291f}
+header{background:linear-gradient(#263c3d,#14292d);border-bottom-color:#b97837}
+header .brand{font-family:Georgia,serif;font-weight:900;font-size:12px;color:#f1dfb6;text-shadow:2px 2px #9f3d34}
+#shop{background:linear-gradient(#d7a66e22,#d7a66e22),url('assets/art-direction-v05.png') center 45%/cover no-repeat}
+.art-backdrop{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(255,244,205,.06),rgba(21,50,52,.12));pointer-events:none}
+.wall-sign{background:#173b4b;color:#f0d9a8;border-color:#a74635;box-shadow:3px 3px #52382b}
+.door{background:#4b8791aa}.freezer{background:#d9edf0;color:#26718a}.shelf{opacity:.75}
+#counter{background:linear-gradient(#95613a,#65412d);border-top-color:#3b291f;box-shadow:inset 0 5px #b87b46}
+#tickets{background:linear-gradient(#8b5b38,#67432d)}
+.ticket{background:#f5e5bd;border-color:#5b3829;box-shadow:3px 3px #4b3024}
+.ticket b{color:#a23e32}
+#stations{background:linear-gradient(#384a47,#263b39);gap:7px}
+.station,#drink{border-color:#171f1e;background:linear-gradient(#e5d6ad,#bfae86);box-shadow:inset 0 4px #fff1c8,4px 4px #172421;border-radius:4px}
+.station:before,#drink:before{height:29px;border-color:#272a27;box-shadow:inset 0 0 0 2px #8b8a74}
+.station.chips:before{background:repeating-linear-gradient(90deg,#e1a629 0 5px,#f4ca4b 5px 9px)}
+.station.fish:before{background:linear-gradient(135deg,#c68b42,#e4bd68 50%,#b36f35 51%,#d79a4c)}
+.station.burger:before{background:radial-gradient(circle at 25% 45%,#5c3325 0 14%,transparent 15%),radial-gradient(circle at 72% 45%,#6d3c29 0 14%,transparent 15%),#3a302a}
+#drink:before{background:repeating-linear-gradient(90deg,#b83d36 0 8px,#eee2ba 8px 12px,#2b7d91 12px 20px)}
+.station b,#drink b{background:#e7b94c;border:2px solid #5a3929;padding:2px 5px;margin-top:2px}
+.customer .head,.customer .body{image-rendering:pixelated;box-shadow:1px 1px #252822}
+.customer .mood{box-shadow:1px 1px #15201f}
+footer{background:#172b30;border-top:2px solid #c38a42}
+footer button{background:#d6c39a;border-color:#5a3d2b}
+#upgradeBtn{background:#2b6684;color:#fff1c9}
+.overlay{background:
+linear-gradient(rgba(19,49,55,.08),rgba(19,49,55,.18)),
+url('assets/art-direction-v05.png') center/cover no-repeat}
+.menu-card{background:#f2dfaaee;border-color:#243b3d;box-shadow:9px 9px #6e3f2d}
+.logo-lockup{font-family:Georgia,serif;color:#173d50;text-shadow:2px 2px #e8bd68;margin-bottom:12px}
+.logo-lockup span{display:block;font-size:34px;font-weight:900;letter-spacing:-2px}
+.logo-lockup b{display:inline-block;background:#a83d35;color:#f7e2b5;border:3px solid #5a3328;padding:3px 10px;font-size:14px;text-shadow:1px 1px #572d28}
+.logo-lockup small{display:block;font:700 7px "Courier New",monospace;margin-top:5px;color:#62442f}
+.menu-card h1{display:none}
+.primary{background:#3e8b47;border-color:#183b31;box-shadow:0 5px 0 #183b31}
+.secondary{background:#2c6d91;color:#fff1c9}
+
+/* V0.5.1 guided first-order tutorial */
+.tutorial{position:absolute;inset:48px 0 46px;z-index:80;pointer-events:none}
+.tutorial.hidden{display:none}
+#tutorialShade{position:absolute;inset:0;background:rgba(10,25,27,.28)}
+#tutorialCard{position:absolute;left:50%;top:14px;transform:translateX(-50%);width:88%;background:#fff0c2;border:4px solid #17383a;box-shadow:5px 5px #75452f;padding:8px 38px 8px 10px;font-size:9px;line-height:1.35;color:#273735;z-index:82}
+#tutorialCard b{display:block;color:#b43f35;font-size:11px;margin-bottom:2px}
+#tutorialGesture{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-style:normal;font-size:27px;color:#2d7f89;animation:tutMove .55s infinite alternate}
+@keyframes tutMove{to{transform:translateY(-40%)}}
+.tutorial-target{position:relative!important;z-index:81!important;outline:5px solid #f4d84e!important;filter:drop-shadow(0 0 7px #fff2a3)!important;animation:tutPulse .55s infinite alternate!important}
+@keyframes tutPulse{to{outline-width:8px}}
+.customer.tutorial-target{position:absolute!important}
+.tutorial .finger-note{font-weight:900}
